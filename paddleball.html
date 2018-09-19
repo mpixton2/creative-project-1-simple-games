@@ -1,0 +1,144 @@
+<!--The basis of this game was taking from a tutorial I read at developer.mozilla.org/en-US/docs/Games/Tutorials/2D_Breakout_game_pure_JavaScript.
+However I added a number of things and changed some things around to more of my liking.
+Most of the code is Javascript, the draw function is contiually calling itself ad updating the location of the ball, paddle and score.-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Creative Project</title>
+    <style>
+    	* { padding: 0; margin: 0; }
+    	canvas { background: #e8ecf2; display: block; margin: 0 auto; }
+    </style>
+</head>
+
+
+<body>
+<canvas id="myCanvas" width="480" height="320"></canvas>
+<script>
+	var canvas = document.getElementById("myCanvas");
+    var ctx = canvas.getContext("2d");
+    var ballRadius = 10;
+    var x = canvas.width/2;
+    var y = canvas.height-30;
+    var dx = 1.5+Math.random();
+    var dy = -1.5-Math.random();
+    var paddleHeight = 10;
+    var paddleWidth = 85;
+    var paddleX = (canvas.width-paddleWidth)/2;
+    var rightPressed = false;
+    var leftPressed = false;
+    var score = 0;
+    document.addEventListener("keydown", keyDownHandler, false);
+    document.addEventListener("keyup", keyUpHandler, false);
+    
+    function drawBall() {
+        ctx.beginPath();
+        ctx.arc(x, y, ballRadius, 0, Math.PI*2);
+        ctx.fillStyle = "red";
+        ctx.fill();
+        ctx.closePath();
+    }
+    
+    function drawScore() {
+        ctx.font = "16px Arial";
+        ctx.fillStyle = "black";
+        ctx.fillText("Score: "+score, 8, 20);
+    }
+    
+    function drawPaddle() {
+        ctx.beginPath();
+        ctx.rect(paddleX, canvas.height-paddleHeight, paddleWidth, paddleHeight);
+        ctx.fillStyle = "black";
+        ctx.fill();
+        ctx.closePath();
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawScore();
+        drawBall();
+        drawPaddle();
+        x += dx;
+        y += dy;
+        
+        if(x + dx > canvas.width-ballRadius || x + dx < ballRadius) {
+            dx = -dx;
+        }
+        if(y + dy < ballRadius) {
+            dy = -dy;
+        }
+        else if(y + dy > canvas.height-ballRadius - paddleHeight/2) {
+            if(x > paddleX && x < paddleX + paddleWidth) {
+                dy = -dy;
+                if(dy < 0){
+                    dy = dy - .5;
+                }
+                else{
+                    dy = dy + .5;
+                }
+                if (dx < 0){
+                    dx = dx - .5;
+                }
+                else{
+                    dx = dx + .5;
+                }
+                
+                score++;
+                
+            }
+            else {
+                drawBall();
+                drawPaddle();
+                alert("GAME OVER");
+            
+                x = canvas.width/2;
+                y = canvas.height-30;
+                dx = 1.5+Math.random();
+                dy = -1.5-Math.random();
+                score = 0;
+                rightPressed = false;
+                leftPressed = false;
+                ctx.clearRect(0, 0, canvas.width, canvas.height)
+            
+            }
+        }
+        
+        if(rightPressed && paddleX < canvas.width-paddleWidth) {
+            paddleX += 10;
+        }
+        else if(leftPressed && paddleX > 0) {
+            paddleX -= 10;
+        }
+        
+        requestAnimationFrame(draw);
+    }
+    
+    
+    function keyDownHandler(e) {
+        if(e.keyCode == 39) {
+            rightPressed = true;
+        }
+        else if(e.keyCode == 37) {
+            leftPressed = true;
+        }
+    }      
+
+    function keyUpHandler(e) {
+        if(e.keyCode == 39) {
+            rightPressed = false;
+        }
+        else if(e.keyCode == 37) {
+            leftPressed = false;
+        }
+        
+    }
+    
+    
+    draw();
+    
+</script>
+
+</body>
+</html>
